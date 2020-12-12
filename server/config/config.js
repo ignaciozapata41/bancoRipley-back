@@ -12,8 +12,8 @@ if (typeof process.env.AMBIENTE == "undefined") {
 // Archivo para definir las variables de entorno que se ocuparan en todo el sitio web
 if (process.env.AMBIENTE && process.env.AMBIENTE.trim() == 'pro') {
     console.log('PRODUCCION');
-    process.env.urlMongo = `localhost`;
+    process.env.urlMongo = `mongodb://ripley_user:ripley_pass@52.72.87.234:27017/ripley`;
 } else {
     console.log('DESARROLLO');
-    process.env.urlMongo = `localhost`;
+    process.env.urlMongo = `mongodb://ripley_user:ripley_pass@52.72.87.234:27017/ripley`;
 }

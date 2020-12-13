@@ -1,7 +1,8 @@
 const axios = require('axios');
 const Users = require('../../models/UsersModel');
+let { createBankAcc } = require('../bankAccount/bankAcc.functions')
+
 var jwt = require('jsonwebtoken');
-const { response } = require('./accountActions.router');
 
 require('../../config/config');
 
@@ -15,6 +16,8 @@ async function createNewUser(req,res){
             if(err) return res.status(500).send('Ha ocurrido un problema intentando crear el usuario'); 
 
             if(!userSaved) return res.status(404).send('No fue posible crear el usuario.');
+
+            createBankAcc(userSaved.rut);
 
             return res.status(200).send({
                 data: userSaved,
@@ -47,7 +50,7 @@ async function login(req, res){
 
     res.send({
         msg: "OK",
-        data: token,
+        data: {token, user},
     })
   }catch(e){
     res.status(500).send("Ha ocurrido un error intentando acceder a su cuenta.");

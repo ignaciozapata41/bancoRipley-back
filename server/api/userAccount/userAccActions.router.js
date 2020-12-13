@@ -1,6 +1,6 @@
 const express = require("express");
 
-const acoountActionsFuncs = require('./accountActions.functions');
+const acoountActionsFuncs = require('./userAccActions.functions');
 
 const app = express();
 

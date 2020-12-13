@@ -5,6 +5,7 @@ const bankAccFuncs = require('./bankAcc.functions');
 const app = express();
 
 // Post
-app.post('/api/pruebaRipley/bankAcc/chargeMount', bankAccFuncs.chargeMount);
+app.put('/api/pruebaRipley/bankAcc/chargeAmount', bankAccFuncs.chargeMount);
+app.post('/api/pruebaRipley/bankAcc/getUserBankAcc', bankAccFuncs.getUserBankAcc);
 
 module.exports = app;

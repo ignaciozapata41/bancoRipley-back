@@ -1,16 +1,12 @@
 const express = require("express");
 
-const func = require('./accountActions.functions');
+const acoountActionsFuncs = require('./accountActions.functions');
 
 const app = express();
 
-
-async function login(req, res){
-    console.log('entre');
-}
-
 // Post
-app.post('/api/pruebaRipley/users/login', login);
+app.post('/api/pruebaRipley/users/newUser', acoountActionsFuncs.createNewUser);
+app.post('/api/pruebaRipley/users/login', acoountActionsFuncs.login);
 
 
 module.exports = app;

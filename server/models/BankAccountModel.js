@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UsersSchema = new Schema({
+const BankAccountSchema = new Schema({
     account_number:{
         type: String,
         unique: true
@@ -17,4 +17,4 @@ const UsersSchema = new Schema({
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('BankAccount', UsersSchema, 'BankAccount');
+module.exports = mongoose.model('BankAccount', BankAccountSchema, 'BankAccount');

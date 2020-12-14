@@ -2,6 +2,7 @@ const axios = require('axios');
 const { response } = require('express');
 const BankAcc = require('../../models/BankAccountModel');
 const BankAccHistory = require('../../models/BankAccHistoryModel');
+const e = require('express');
 
 async function changeAmount(req,res){
     let acc_number = req.body.acc_number || '';
@@ -121,16 +122,19 @@ async function getBankAccHistory(req,res){
     let userAccount = req.query.acc_number;
 
     try{
-        let BankAccLogOrigen = await BankAccHistory.find({origin: userAccount});
-        let BankAccLogDest = await BankAccHistory.find({destination: userAccount});
-
         let arrayHistorys = [];
-        for(movement of BankAccLogOrigen){
-            arrayHistorys.push({...movement.toJSON(), outMovement: false})
-        }
 
-        for(movement of BankAccLogDest){
-            arrayHistorys.push({...movement.toJSON(), outMovement: true})
+        let historyMovements = await BankAccHistory.find({$or: [{origin: userAccount}, {destination: userAccount}]}).sort({createdAt: 1})
+
+        for(let el of historyMovements){
+            arrayHistorys.push({
+                transferType: el.transferType,
+                amount: el.amount,
+                origin: el.origin,
+                destination: el.destination,
+                createdAt: el.createdAt,
+                outMovement: el.destination === userAccount? true : false,
+            })
         }
 
         return res.status(200).send({

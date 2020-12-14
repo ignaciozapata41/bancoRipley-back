@@ -16,7 +16,7 @@ async function changeAmount(req,res){
 
         userAccBank.amount = type === 'withdraw'?  (userAccBank.amount - amount) : (amount + userAccBank.amount);
         
-        userAccBank.save((err, updatedAcc) => {
+        userAccBank.save(async (err, updatedAcc) => {
             if(err){
                 console.log('Error actualizando el monto de una cuenta', err);
                 return res.status(500).send("Ha ocurrido un error al actualizar la cuenta bancaria.");
@@ -29,8 +29,6 @@ async function changeAmount(req,res){
                 data: updatedAcc
             })
         });
-
-
 
     }catch(e){
         console.log('Ha ocurrido un error intentando cambiar el monto en la cuenta de banco de un usuario', e);
@@ -46,17 +44,17 @@ async function transferAmount(req,res){
     try{
         let destinationBankAcc = await BankAcc.findOne({rut: destinationRut});
 
-        if(destinationBankAcc === undefined) return res.status(404).send("No se ha encontrado la cuenta de destino.");
+        if(!destinationBankAcc) return res.status(404).send("No se ha encontrado la cuenta de destino. Favor verificar rut ingresado");
 
         destinationBankAcc.amount = destinationBankAcc.amount + amount;
 
-        destinationBankAcc.save((err, destinationBankAccSaved) => {
+        destinationBankAcc.save(async (err, destinationBankAccSaved) => {
             if(err){
                 console.log('Error al realizar una transferencia', err);
                 return res.status(500).send("Ha ocurrido un error al actualizar la cuenta bancaria.");
             }
 
-            originBankAcc = await BankAcc.findOne({rut: rutOrigin});
+            let originBankAcc = await BankAcc.findOne({rut: rutOrigin});
             originBankAcc.amount = (originBankAcc.amount - amount);
             originBankAcc.save();
 
@@ -69,7 +67,8 @@ async function transferAmount(req,res){
 
         });
     }catch(e){
-
+        console.log('Ha ocurrido un error intentando transferir el saldo en la cuenta del destinatario', e);
+        res.status(500).send('Ha ocurrido un error intentando transferir el saldo en la cuenta del destinatario: ');
     }
 
 }
@@ -114,7 +113,34 @@ async function setBankAccHistory(transferType, amount, origin, destination ){
         let newBankAccHistory = await new BankAccHistory({transferType, amount, origin, destination})
         newBankAccHistory.save();
     }catch(e){
+        console.log('Han ocurrido errores intentando crear el historial para un movimiento en particular', e);
+    }
+}
 
+async function getBankAccHistory(req,res){
+    let userAccount = req.query.acc_number;
+
+    try{
+        let BankAccLogOrigen = await BankAccHistory.find({origin: userAccount});
+        let BankAccLogDest = await BankAccHistory.find({destination: userAccount});
+
+        let arrayHistorys = [];
+        for(movement of BankAccLogOrigen){
+            arrayHistorys.push({...movement.toJSON(), outMovement: false})
+        }
+
+        for(movement of BankAccLogDest){
+            arrayHistorys.push({...movement.toJSON(), outMovement: true})
+        }
+
+        return res.status(200).send({
+            msg: 'ok',
+            data: arrayHistorys
+        })
+        
+    }catch(e){
+        console.log('Error intentando obtener el historial de movimientos de la cuenta nro '+userAccount, e);
+        return res.status(500).send('Ha ocurrido un error intentando obtener el historial de movimientos');
     }
 }
 
@@ -123,4 +149,5 @@ module.exports = {
     createBankAcc,
     getUserBankAcc,
     transferAmount,
+    getBankAccHistory,
 }

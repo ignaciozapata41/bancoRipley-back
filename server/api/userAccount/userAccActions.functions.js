@@ -39,7 +39,7 @@ async function login(req, res){
 
     let user = await Users.findOne({rut: userRut})
 
-    if(!user || (password != user.password)) res.status(401).send('El rut o la contraseña no corresponden');
+    if(!user || (password != user.password)) return res.status(401).send('El rut o la contraseña son incorrectas');
 
     user.password = '....'
     
